@@ -39,12 +39,12 @@ def postprocess(input_file, output_file):
         data = yaml.safe_load(f)
     data = convert_updated(data['weblate'])
     with open(output_file, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(data, f, default_flow_style=False)
+        yaml.safe_dump(data, f, sort_keys=False, default_flow_style=False, allow_unicode=True, width=float('inf'))
 
 def main():
     args = sys.argv[1:]
     if len(args) < 2:
-        print('Usage: python3 %s <input yaml> <output yaml>' % sys.argv[0])
+        print('Usage: python %s <input yaml> <output yaml>' % sys.argv[0])
         sys.exit(1)
     input_file, output_file = args
     postprocess(input_file, output_file)

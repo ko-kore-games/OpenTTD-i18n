@@ -23,7 +23,7 @@ def convert(type, base, updated):
 
 def main():
     if len(sys.argv) < 3:
-        print('Usage: python3 %s <type> <base&output txt file> <updated yaml file>' % sys.argv[0])
+        print('Usage: python %s <type> <base txt file> <updated yaml file>' % sys.argv[0])
         sys.exit(1)
 
     type, base_file, updated_file = sys.argv[1:]
@@ -41,8 +41,7 @@ def main():
         updated = yaml.load(f, Loader=yaml.FullLoader)
 
     result = convert(type, base, updated)
-    with open(base_file, 'w') as f:
-        f.write(result)
+    print(result)
 
 if __name__ == '__main__':
     main()
