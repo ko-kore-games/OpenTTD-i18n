@@ -22,7 +22,7 @@ def convert(data):
 
 def main():
     if len(sys.argv) != 3:
-        print('Usage: python3 %s <base> <extra>' % sys.argv[0])
+        print('Usage: python %s <base> <extra>' % sys.argv[0])
         sys.exit(1)
 
     base, extra = sys.argv[1:]
@@ -47,7 +47,7 @@ def main():
         'extra': extra_data,
     }
 
-    result = yaml.dump(data, allow_unicode=True, width=float('inf'))
+    result = yaml.dump(data, sort_keys=False, default_flow_style=False, allow_unicode=True, width=float('inf'))
     print(result)
 
 if __name__ == '__main__':

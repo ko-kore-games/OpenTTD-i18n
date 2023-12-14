@@ -15,39 +15,41 @@ replacements = [
     [';', '；'],
 ]
 
-def convert_updated(updated):
-    return reduce(lambda acc, rep: replace_punctuations(acc, rep[0], rep[1]), replacements, updated)
+def convert_all(data):
+    return {key: convert(value) for key, value in data.items()}
+
+def convert(str):
+    return reduce(lambda acc, rep: replace_punctuations(acc, rep[0], rep[1]), replacements, str)
 
 def replace_punctuations(acc, src, dst):
-    if len(src) > 1:
-        return acc.replace(src, dst)
     result = []
-    brace_level = 0
+    brace_depth = 0
     for c in acc:
         if c == '{':
-            brace_level += 1
+            brace_depth += 1
         elif c == '}':
-            brace_level -= 1
-        if brace_level == 0 and c == src:
+            brace_depth -= 1
+        if brace_depth == 0 and c == src:
             result.append(dst)
         else:
             result.append(c)
-    return result
+    return ''.join(result)
 
-def postprocess(input_file, output_file):
-    with open(input_file, 'r', encoding='utf-8') as f:
-        data = yaml.safe_load(f)
-    data = convert_updated(data['weblate'])
-    with open(output_file, 'w', encoding='utf-8') as f:
-        yaml.safe_dump(data, f, default_flow_style=False)
+def postprocess(data):
+    return {
+        'base': convert_all(data['base']),
+        'extra': convert_all(data['extra']),
+    }
 
-def main():
-    args = sys.argv[1:]
-    if len(args) < 2:
-        print('Usage: python3 %s <input yaml> <output yaml>' % sys.argv[0])
+def main(args):
+    if len(args) < 1:
+        print('Usage: python %s <input yaml>' % sys.argv[0])
         sys.exit(1)
-    input_file, output_file = args
-    postprocess(input_file, output_file)
+    with open(args[0], 'r', encoding='utf-8') as f:
+        data = yaml.safe_load(f)
+    data = postprocess(data)
+    result = yaml.safe_dump(data, sort_keys=False, default_flow_style=False, allow_unicode=True, width=float('inf'))
+    print(result)
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])

@@ -3,18 +3,27 @@ import sys
 import yaml
 import os.path as path
 
-def convert(type, old_file, new_file):
+# A script to generate diff between original files
+
+def diff(type, old_file, new_file):
     with open(old_file, 'r') as f:
         old_data = yaml.safe_load(f.read())
     with open(new_file, 'r') as f:
         new_data = yaml.safe_load(f.read())
 
+    old = old_data[type]
+    new = new_data[type]
+
     result = {}
-    for key in new_data[type]:
-        if key in old_data[type]:
-            result[key] = old_data[type][key]
-        else:
-            result[key] = new_data[type][key]
+    keys = [*old.keys(), *new.keys()]
+    for key in keys:
+        if key in old and key in new:
+            if old[key] != new[key]:
+                result[key] = new[key]
+        elif key in old and key not in new:
+            result[key] = None
+        elif key not in old and key in new:
+            result[key] = new[key]
     return result
 
 def main():
@@ -31,8 +40,8 @@ def main():
         sys.exit(1)
 
     result = {
-        'base': convert('base', old_file, new_file),
-        'extra': convert('extra', old_file, new_file),
+        'base': diff('base', old_file, new_file),
+        'extra': diff('extra', old_file, new_file),
     }
 
     result = yaml.safe_dump(result, sort_keys=False, default_flow_style=False, allow_unicode=True, width=float('inf'))
