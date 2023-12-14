@@ -1,12 +1,11 @@
 
 import sys
+import re
 import yaml
 from functools import reduce
 
 replacements = [
     [' ', ''],
-    ['...', '…'],
-    ['..', '‥'],
     ['.', '。'],
     [',', '、'],
     ['?', '？'],
@@ -15,11 +14,20 @@ replacements = [
     [';', '；'],
 ]
 
+regex_replacements = [
+    [re.compile(r'。。。'), '…'],
+    [re.compile(r'。。'), '‥'],
+    [re.compile(r'(?<![^A-Za-z])。(?![^A-Za-z])'), '.'],
+    [re.compile(r'(?<![^0-9])。(?![^0-9])'), '.']
+]
+
 def convert_all(data):
     return {key: convert(value) for key, value in data.items()}
 
 def convert(str):
-    return reduce(lambda acc, rep: replace_punctuations(acc, rep[0], rep[1]), replacements, str)
+    str = reduce(lambda acc, rep: replace_punctuations(acc, rep[0], rep[1]), replacements, str)
+    str = reduce(lambda acc, rep: re.sub(rep[0], rep[1], acc), regex_replacements, str)
+    return str
 
 def replace_punctuations(acc, src, dst):
     result = []
