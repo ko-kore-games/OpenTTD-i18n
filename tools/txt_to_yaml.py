@@ -18,24 +18,37 @@ def convert(data):
     lines = [convert_line(line) for line in lines]
     lines = [line for line in lines if line is not None]
     dict = {key: value for key, value in lines}
-    content = {'weblate': dict,}
-    result = yaml.dump(content, allow_unicode=True, width=float('inf'))
-    return result
+    return dict
 
 def main():
-    if len(sys.argv) < 2:
-        print('Usage: python3 %s <path to file>' % sys.argv[0])
+    if len(sys.argv) != 3:
+        print('Usage: python3 %s <base> <extra>' % sys.argv[0])
         sys.exit(1)
 
-    path_to_file = sys.argv[1]
-    if not path.exists(path_to_file):
-        print('File %s does not exist' % path_to_file)
+    base, extra = sys.argv[1:]
+
+    if not path.exists(base):
+        print('File %s does not exist' % base)
+        sys.exit(1)
+    if not path.exists(extra):
+        print('File %s does not exist' % extra)
         sys.exit(1)
 
-    with open(path_to_file, 'r') as f:
-        data = f.read()
+    with open(base, 'r') as f:
+        base_data = f.read()
+    
+    with open(extra, 'r') as f:
+        extra_data = f.read()
 
-    print(convert(data))
+    base_data = convert(base_data)
+    extra_data = convert(extra_data)
+    data = {
+        'base': base_data,
+        'extra': extra_data,
+    }
+
+    result = yaml.dump(data, allow_unicode=True, width=float('inf'))
+    print(result)
 
 if __name__ == '__main__':
     main()
