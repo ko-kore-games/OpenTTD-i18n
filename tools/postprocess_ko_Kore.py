@@ -1,7 +1,6 @@
 
 import sys
 import yaml
-import os.path as path
 from functools import reduce
 
 replacements = [

@@ -15,9 +15,9 @@ def convert_line(line, updated):
     else:
         return line
 
-def convert(base, updated):
+def convert(type, base, updated):
     lines = base.split('\n')
-    lines = [convert_line(line, updated['weblate']) if line != '' and line[0]!= '#' else line for line in lines]
+    lines = [convert_line(line, updated[type]) if line != '' and line[0]!= '#' else line for line in lines]
     result = '\n'.join(lines)
     return result
 
@@ -26,12 +26,11 @@ def main():
         print('Usage: python3 %s <base&output txt file> <updated yaml file>' % sys.argv[0])
         sys.exit(1)
 
-    base_file = sys.argv[1]
+    type, base_file, updated_file = sys.argv[1:]
     if not path.exists(base_file):
         print('File %s does not exist' % base_file)
         sys.exit(1)
 
-    updated_file = sys.argv[2]
     if not path.exists(updated_file):
         print('File %s does not exist' % updated_file)
         sys.exit(1)
@@ -41,7 +40,7 @@ def main():
     with open(updated_file, 'r') as f:
         updated = yaml.load(f, Loader=yaml.FullLoader)
 
-    result = convert(base, updated)
+    result = convert(type, base, updated)
     with open(base_file, 'w') as f:
         f.write(result)
 
